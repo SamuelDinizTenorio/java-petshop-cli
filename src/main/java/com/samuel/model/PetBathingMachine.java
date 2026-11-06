@@ -1,6 +1,9 @@
 package com.samuel.model;
 
 import com.samuel.exception.MaximumCapacityReachedException;
+
+import java.util.Optional;
+
 import com.samuel.exception.InsufficientStockException;
 import com.samuel.exception.MachineIsDirtyException;
 import com.samuel.exception.PetNotInMachineException;
@@ -82,12 +85,21 @@ public class PetBathingMachine {
     }
 
     /**
+     * Retrieves the pet currently in the machine.
+     *
+     * @return an {@link Optional} containing the current {@link Pet}, or an empty {@link Optional} if no pet is present
+     */
+    public Optional<Pet> getPet() {
+        return Optional.ofNullable(this.pet);
+    }
+
+    /**
      * Checks whether a pet is currently placed in the machine.
      *
      * @return {@code true} if a pet is present, {@code false} otherwise
      */
     public boolean hasPet() {
-        return this.pet != null;
+        return getPet().isPresent();
     }
 
     /**
@@ -109,10 +121,13 @@ public class PetBathingMachine {
      *
      * @throws PetNotInMachineException if there is no pet in the machine to remove
      */
-    public void removePet() {
+    public Pet removePet() {
         if (!hasPet()) throw new PetNotInMachineException("A máquina está vazia.");
         if (!this.pet.isClean()) this.clean = false;
+
+        Pet removedPet = this.pet;
         this.pet = null;
+        return removedPet;
     }
 
     /**
