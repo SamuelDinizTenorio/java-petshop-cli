@@ -3,8 +3,11 @@ package com.samuel.exception;
 /**
  * Thrown to indicate that a supply (such as water or shampoo) has insufficient stock
  * to perform the requested operation.
+ * <p>
+ * This class extends {@link BusinessException}.
+ * </p>
  */
-public class InsufficientStockException extends RuntimeException {
+public class InsufficientStockException extends BusinessException {
 
     /**
      * Constructs a new {@code InsufficientStockException} for the specified resource name.

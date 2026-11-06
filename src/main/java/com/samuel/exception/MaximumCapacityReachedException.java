@@ -3,8 +3,11 @@ package com.samuel.exception;
 /**
  * Thrown to indicate that a supply container (e.g., water or shampoo reservoir)
  * has already reached its maximum storage capacity and cannot be refilled further.
+ * <p>
+ * This class extends {@link BusinessException}.
+ * </p>
  */
-public class MaximumCapacityReachedException extends RuntimeException {
+public class MaximumCapacityReachedException extends BusinessException {
 
     /**
      * Constructs a new {@code MaximumCapacityReachedException} for the specified resource name.
