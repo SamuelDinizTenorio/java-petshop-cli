@@ -5,6 +5,7 @@ import com.samuel.exception.MaximumCapacityReachedException;
 import java.util.Optional;
 
 import com.samuel.exception.InsufficientStockException;
+import com.samuel.exception.MachineIsCleanException;
 import com.samuel.exception.MachineIsDirtyException;
 import com.samuel.exception.PetNotInMachineException;
 import com.samuel.exception.PetIsAlreadyInMachineException;
@@ -134,9 +135,11 @@ public class PetBathingMachine {
      * Washes and sanitizes the machine itself.
      * Consumes 3.0 units of water and 1.0 unit of shampoo, setting the machine status to clean.
      *
+     * @throws MachineIsCleanException if the machine is already clean
      * @throws InsufficientStockException if there is not enough water or shampoo
      */
     public void wash() {
+        if (this.clean) throw new MachineIsCleanException();
         if (this.water < 3.0) throw new InsufficientStockException("água");
         if (this.shampoo < 1.0) throw new InsufficientStockException("shampoo");
         this.water -= 3.0;
