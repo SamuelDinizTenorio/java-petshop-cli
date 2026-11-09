@@ -1,6 +1,7 @@
 package model;
 
 import com.samuel.exception.InsufficientStockException;
+import com.samuel.exception.MachineIsCleanException;
 import com.samuel.exception.MachineIsDirtyException;
 import com.samuel.exception.MaximumCapacityReachedException;
 import com.samuel.exception.PetIsAlreadyInMachineException;
@@ -283,6 +284,14 @@ class PetBathingMachineTest {
     class WashMachineTests {
 
         @Test
+        @DisplayName("Should throw MachineIsCleanException when trying to wash an already clean machine")
+        void shouldThrowExceptionWhenMachineIsAlreadyClean() {
+            assertThatThrownBy(() -> machine.wash())
+                    .isInstanceOf(MachineIsCleanException.class)
+                    .hasMessage("A máquina já está limpa.");
+        }
+
+        @Test
         @DisplayName("Should wash machine successfully, consuming 3.0 water, 1.0 shampoo, and setting clean to true")
         void shouldWashMachineSuccessfully() {
             // Make machine dirty
@@ -315,7 +324,13 @@ class PetBathingMachineTest {
                 machine.removePet();
             }
 
-            // Water is 0.0, shampoo has remaining stock
+            // At this point water is 0.0, but the machine was kept clean because pets were cleaned before removal.
+            // Put and remove an unwashed pet to make the machine dirty without needing water.
+            Pet dirtyPet = new Pet("Dirty Pet");
+            machine.putPet(dirtyPet);
+            machine.removePet(); // Machine is now dirty!
+
+            // Water is 0.0 (< 3.0), machine is dirty, shampoo is 4.0 (>= 1.0)
             assertThatThrownBy(() -> machine.wash())
                     .isInstanceOf(InsufficientStockException.class)
                     .hasMessage("Estoque de água insuficiente! È necessario reabastecer.");
@@ -324,7 +339,7 @@ class PetBathingMachineTest {
         @Test
         @DisplayName("Should throw InsufficientStockException when shampoo is less than 1.0 during wash")
         void shouldThrowExceptionWhenShampooIsInsufficientForWash() {
-            // Drain shampoo by taking 5 showers
+            // Drain shampoo by taking 5 showers (10 - 10 = 0.0)
             for (int i = 1; i <= 3; i++) {
                 Pet pet = new Pet("Pet " + i);
                 machine.putPet(pet);
@@ -347,7 +362,12 @@ class PetBathingMachineTest {
             // Refill water so water >= 3.0 (e.g. 10.0), shampoo remains 0.0 (< 1.0)
             for (int i = 0; i < 5; i++) machine.addWater();
 
-            // Shampoo is 0.0, water is plentiful
+            // Make machine dirty by putting and removing a dirty pet
+            Pet dirtyPet = new Pet("Dirty Pet");
+            machine.putPet(dirtyPet);
+            machine.removePet(); // Machine is now dirty!
+
+            // Shampoo is 0.0 (< 1.0), water is plentiful, machine is dirty
             assertThatThrownBy(() -> machine.wash())
                     .isInstanceOf(InsufficientStockException.class)
                     .hasMessage("Estoque de shampoo insuficiente! È necessario reabastecer.");
